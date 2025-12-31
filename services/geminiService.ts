@@ -1,9 +1,8 @@
 import { GoogleGenAI, Type } from "@google/genai";
-// FIX: Changed '../types' to './types'
+// FIX: Uses ./types
 import { UserInput, AnalysisResult, GroundingSource } from "./types";
 
 export const analyzePotential = async (input: UserInput): Promise<AnalysisResult> => {
-  // Use Vercel Environment Variable
   const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || process.env.API_KEY });
   
   const prompt = `
