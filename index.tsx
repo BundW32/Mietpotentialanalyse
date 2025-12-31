@@ -1,17 +1,17 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-// FIX: Named import to match App.tsx
+// IMPORTING { App } with curly braces to match the Named Export
 import { App } from './App';
 import './index.css';
 
 const rootElement = document.getElementById('root');
 
 if (!rootElement) {
-  throw new Error("Failed to find the root element");
+  console.error("Critical: Could not find root element!");
+} else {
+  ReactDOM.createRoot(rootElement).render(
+    <React.StrictMode>
+      <App />
+    </React.StrictMode>
+  );
 }
-
-ReactDOM.createRoot(rootElement).render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
-);
