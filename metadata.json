@@ -1,0 +1,5 @@
+{
+  "name": "B&W Immobilien Management UG (haftungsbeschränkt) - Potentialanalyse",
+  "description": "Real estate rental potential analysis tool using AI to compare current rent against market value and Mietspiegel data.",
+  "requestFramePermissions": []
+}
