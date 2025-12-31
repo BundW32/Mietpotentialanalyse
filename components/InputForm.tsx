@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-// FIX: Changed '../types' to './types'
+// FIX: Uses ./types (Single dot)
 import { PropertyType, Condition, UserInput } from './types';
 import { MapPin, Ruler, Building, Coins, Sparkles, Loader2, ChevronRight, CalendarDays, Home } from 'lucide-react';
 
