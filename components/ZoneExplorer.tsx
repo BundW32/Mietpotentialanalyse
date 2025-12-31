@@ -1,7 +1,7 @@
-
 import React, { useState } from 'react';
-import { LocationZone } from '../types';
-import { Map as MapIcon, Info, Navigation, ExternalLink, MapPin } from 'lucide-react';
+// FIX: Changed '../types' to './types' to prevent crash
+import { LocationZone } from './types'; 
+import { Map as MapIcon, Info } from 'lucide-react';
 
 interface ZoneExplorerProps {
   zones: LocationZone[];
@@ -9,9 +9,8 @@ interface ZoneExplorerProps {
   cityName: string;
 }
 
-const ZoneExplorer: React.FC<ZoneExplorerProps> = ({ zones, mapLink, cityName }) => {
-  const [selectedZone, setSelectedZone] = useState<string | null>(zones[1]?.id || null);
-
+const ZoneExplorer: React.FC<ZoneExplorerProps> = ({ zones, cityName }) => {
+  const [selectedZone, setSelectedZone] = useState<string | null>(zones[1]?.id || zones[0]?.id || null);
   const activeZone = zones.find(z => z.id === selectedZone);
 
   return (
@@ -26,7 +25,7 @@ const ZoneExplorer: React.FC<ZoneExplorerProps> = ({ zones, mapLink, cityName })
       </div>
 
       <div className="p-4">
-        {/* Compact Tabs */}
+        {/* Tabs */}
         <div className="grid grid-cols-3 gap-2 mb-4">
           {zones.map((zone) => (
             <button
@@ -47,7 +46,7 @@ const ZoneExplorer: React.FC<ZoneExplorerProps> = ({ zones, mapLink, cityName })
           ))}
         </div>
 
-        {/* Detailed Zone Content - Slimmer */}
+        {/* Content */}
         {activeZone && (
           <div className="bg-slate-50 rounded-lg p-4 border border-slate-100 animate-in fade-in duration-300">
             <div className="space-y-3">
@@ -75,4 +74,4 @@ const ZoneExplorer: React.FC<ZoneExplorerProps> = ({ zones, mapLink, cityName })
   );
 };
 
-export default ZoneExplorer;
+export default ZoneExplorer; ´
