@@ -1,109 +1,89 @@
-
-import { GoogleGenAI } from "@google/genai";
-import { UserInput, AnalysisResult, LocationZone } from "../types";
-
-/**
- * Hilfsfunktion zur robusten Extraktion von JSON aus einem String.
- */
-function extractJSON(text: string): any {
-  try {
-    const start = text.indexOf('{');
-    const end = text.lastIndexOf('}');
-    
-    if (start === -1 || end === -1) {
-      console.error("Kein JSON im Output gefunden. Rohtext:", text);
-      throw new Error("Die KI hat kein gültiges Ergebnis-Format geliefert.");
-    }
-    
-    const jsonStr = text.substring(start, end + 1);
-    return JSON.parse(jsonStr);
-  } catch (e) {
-    console.error("Parsing-Fehler:", e, "Text:", text);
-    throw new Error("Die Datenanalyse konnte nicht in ein lesbares Format umgewandelt werden.");
-  }
-}
+import { GoogleGenAI, Type } from "@google/genai";
+// FIX: Changed '../types' to './types'
+import { UserInput, AnalysisResult, GroundingSource } from "./types";
 
 export const analyzePotential = async (input: UserInput): Promise<AnalysisResult> => {
-  const modelName = 'gemini-3-pro-preview';
+  // Use Vercel Environment Variable
+  const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || process.env.API_KEY });
   
-  // Sicherer Zugriff auf API_KEY
-  const apiKey = typeof process !== 'undefined' ? process.env?.API_KEY : undefined;
-  
-  if (!apiKey) {
-    throw new Error("API_KEY ist nicht konfiguriert. Bitte wählen Sie einen Key über das Interface aus.");
-  }
-
-  const ai = new GoogleGenAI({ apiKey });
-
   const prompt = `
     DU BIST EIN IMMOBILIEN-EXPERTE FÜR DEN DEUTSCHEN MARKT.
-    Analysiere das Miet-Potential für folgende Immobilie:
+    Analysiere das Miet-Potential für:
     ADRESSE: ${input.address}
-    OBJEKT-DETAILS: ${input.sizeSqm}m², ${input.rooms} Zimmer, Baujahr ${input.yearBuilt}, Zustand: ${input.condition}.
-    ZUSATZ: Balkon: ${input.hasBalcony}, 3-fach Glas: ${input.hasTripleGlazing}, Fußbodenheizung: ${input.hasFloorHeating}.
+    DETAILS: ${input.sizeSqm}m², ${input.rooms} Zimmer, Baujahr ${input.yearBuilt}, Zustand: ${input.condition}.
+    AUSSTATTUNG: Balkon: ${input.hasBalcony}, Fußbodenheizung: ${input.hasFloorHeating}, Barrierefrei: ${input.isBarrierFree}.
 
     AUFGABE:
-    1. Nutze Google Search für eine präzise Marktanalyse, nenne aber im Ergebnis KEINE URLs oder Quellen-Links.
-    2. Berechne eine realistische Marktmiete pro m² basierend auf Lage und Modernisierungsgrad.
-    3. Definiere 3 lokale Lagezonen für diesen Standort.
+    1. Nutze die Google-Suche, um aktuelle Vergleichsmieten (Immoscout24, Mietspiegel der Stadt, lokale Portale) für genau diesen Standort zu finden.
+    2. Berechne die geschätzte Marktmiete pro m².
+    3. Erkläre kurz die Lagequalität.
+    4. Erstelle 3 typische Standort-Zonen (z.B. Einfache Lage, Mittlere Lage, Gute Lage) mit Kurzbeschreibung und Beispielen.
 
-    ANTWORTE AUSSCHLIESSLICH ALS JSON-OBJEKT:
-    {
-      "estimatedMarketRentPerSqm": zahl,
-      "estimatedTotalMarketRent": zahl,
-      "comparableRentLow": zahl,
-      "comparableRentHigh": zahl,
-      "locationAnalysis": "string",
-      "sourceType": "QUALIFIED_MIETSPIEGEL" | "SIMPLE_MIETSPIEGEL" | "MARKET_ESTIMATION",
-      "confidenceScore": zahl (0-100),
-      "featureImpacts": [
-        { "feature": "string", "impactPercent": zahl, "direction": "positive" | "negative", "description": "string" }
-      ],
-      "locationZones": [
-        { "id": "string", "name": "string", "description": "string", "impactPercent": "string", "color": "string", "examples": ["string"] }
-      ]
-    }
+    ANTWORTE IM GEWÜNSCHTEN JSON-FORMAT.
   `;
 
   try {
     const response = await ai.models.generateContent({
-      model: modelName,
+      model: 'gemini-2.0-flash-exp',
       contents: prompt,
       config: {
-        tools: [{ googleSearch: {} }]
+        tools: [{ googleSearch: {} }],
+        responseMimeType: "application/json",
+        responseSchema: {
+          type: Type.OBJECT,
+          properties: {
+            estimatedMarketRentPerSqm: { type: Type.NUMBER },
+            locationAnalysis: { type: Type.STRING },
+            confidenceScore: { type: Type.NUMBER },
+            estimatedTotalMarketRent: { type: Type.NUMBER },
+            potentialYearlyGain: { type: Type.NUMBER },
+            rentGapPercentage: { type: Type.NUMBER },
+            featureImpacts: {
+              type: Type.ARRAY,
+              items: {
+                type: Type.OBJECT,
+                properties: {
+                  feature: { type: Type.STRING },
+                  impactPercent: { type: Type.NUMBER },
+                  direction: { type: Type.STRING },
+                  description: { type: Type.STRING }
+                },
+                required: ["feature", "impactPercent", "direction", "description"]
+              }
+            },
+            locationZones: {
+              type: Type.ARRAY,
+              items: {
+                type: Type.OBJECT,
+                properties: {
+                  id: { type: Type.STRING },
+                  name: { type: Type.STRING },
+                  description: { type: Type.STRING },
+                  color: { type: Type.STRING },
+                  examples: { type: Type.ARRAY, items: { type: Type.STRING } }
+                },
+                required: ["id", "name", "description"]
+              }
+            }
+          }
+        }
       }
     });
 
-    const responseText = response.text || "";
-    const data = extractJSON(responseText);
-    
-    const currentRent = Number(input.currentColdRent) || 0;
-    const targetRent = Number(data.estimatedTotalMarketRent) || (Number(data.estimatedMarketRentPerSqm) * input.sizeSqm);
-
-    const zones: LocationZone[] = (data.locationZones || []).map((z: any, i: number) => ({
-      id: z.id || `zone-${i}`,
-      name: z.name || 'Unbekannte Zone',
-      description: z.description || 'Informationen zur Lage folgen.',
-      impactPercent: z.impactPercent || '0%',
-      color: z.color || '#94a3b8',
-      examples: z.examples || []
-    }));
+    const rawJson = JSON.parse(response.text || "{}");
+    const marketRentTotal = rawJson.estimatedMarketRentPerSqm * input.sizeSqm;
+    const gain = Math.max(0, marketRentTotal - input.currentColdRent);
 
     return {
-      ...data,
-      locationZones: zones,
-      estimatedMarketRentPerSqm: Number(data.estimatedMarketRentPerSqm),
-      estimatedTotalMarketRent: targetRent,
-      mietspiegelMin: (Number(data.comparableRentLow) || Number(data.estimatedMarketRentPerSqm) * 0.9) * input.sizeSqm,
-      mietspiegelMax: (Number(data.comparableRentHigh) || Number(data.estimatedMarketRentPerSqm) * 1.1) * input.sizeSqm,
-      potentialYearlyGain: Math.max(0, targetRent - currentRent) * 12,
-      rentGapPercentage: currentRent > 0 ? ((targetRent - currentRent) / currentRent) * 100 : 0
+      ...rawJson,
+      estimatedTotalMarketRent: marketRentTotal,
+      potentialYearlyGain: gain * 12,
+      rentGapPercentage: input.currentColdRent > 0 ? ((marketRentTotal - input.currentColdRent) / input.currentColdRent) * 100 : 0,
+      sources: [], 
+      sourceType: 'AI_ESTIMATION'
     };
-  } catch (e: any) {
-    console.error("Fehler in analyzePotential:", e);
-    if (e.message?.includes("500")) {
-      throw new Error("Server-Überlastung bei Google. Bitte versuchen Sie es in wenigen Sekunden erneut.");
-    }
-    throw e;
+  } catch (error) {
+    console.error("Gemini Analysis Error:", error);
+    throw error;
   }
 };
