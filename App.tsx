@@ -5,21 +5,19 @@ import { UserInput, AnalysisResult } from './types';
 import { analyzePotential } from './geminiService';
 import { AlertCircle, Scale, RefreshCcw, Key } from 'lucide-react';
 
-// FIX: "export const" makes this a Named Export (Safest method)
+// --- FIXED: NAMED EXPORT (Robust & Safe) ---
 export const App: React.FC = () => {
   const [userInput, setUserInput] = useState<UserInput | null>(null);
   const [result, setResult] = useState<AnalysisResult | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   
-  // Loading Screen State
   const [progress, setProgress] = useState(0);
   const [loadingText, setLoadingText] = useState("Starte Analyse...");
   
   const resultsRef = useRef<HTMLDivElement>(null);
   const appRef = useRef<HTMLDivElement>(null);
 
-  // WordPress Integration
   useEffect(() => {
     const sendHeight = () => {
       if (appRef.current) {
@@ -37,7 +35,6 @@ export const App: React.FC = () => {
     };
   }, [result, userInput, error, isLoading, progress]);
 
-  // Loading Simulation
   const simulateProgress = () => {
     setProgress(0);
     const timer = setInterval(() => {
