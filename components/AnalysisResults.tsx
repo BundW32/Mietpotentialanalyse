@@ -1,8 +1,9 @@
 import React from 'react';
-// FIX: Changed '../types' to './types'
+// FIX: Uses ./types
 import { AnalysisResult, UserInput } from './types';
 import { ResponsiveContainer, ComposedChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, Cell } from 'recharts';
 import { TrendingUp, ArrowRight, BarChart3, PlusCircle, MinusCircle } from 'lucide-react';
+// FIX: Uses ./ZoneExplorer
 import ZoneExplorer from './ZoneExplorer';
 
 interface AnalysisResultsProps {
@@ -24,7 +25,6 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({ result, input }) => {
 
   return (
     <div className="space-y-8 animate-in fade-in pb-12">
-      {/* Metrics Row */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         <div className="bg-slate-900/50 p-4 rounded-xl border border-slate-800">
           <p className="text-[8px] text-slate-400 font-black uppercase mb-1">Aktuell (Ist)</p>
