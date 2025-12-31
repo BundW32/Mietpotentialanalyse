@@ -1,7 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import App from './App';
-import './index.css'; // This loads your Tailwind styles
+// FIX: Curly braces { } import the Named Export from App.tsx
+import { App } from './App';
+import './index.css';
 
 const rootElement = document.getElementById('root');
 
