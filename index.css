@@ -1,50 +1,519 @@
-/* 1. TAILWIND DIRECTIVES (REQUIRED) */
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap');
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
 
-/* 2. GLOBAL STYLES */
-:root {
-  --bw-orange: #f5931f;
-  --bw-green: #034933;
+@theme {
+  --color-primary: var(--color-primary, #059669);
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Cormorant Garamond", serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+  
+  --color-slate-50: #f8fafc;
+  --color-slate-100: #f1f5f9;
+  --color-slate-200: #e2e8f0;
+  --color-slate-300: #cbd5e1;
+  --color-slate-400: #94a3b8;
+  --color-slate-500: #64748b;
+  --color-slate-600: #475569;
+  --color-slate-700: #334155;
+  --color-slate-800: #1e293b;
+  --color-slate-900: #0f172a;
+  
+  --color-gray-50: #f9fafb;
+  --color-gray-100: #f3f4f6;
+  --color-gray-200: #e5e7eb;
+  --color-gray-300: #d1d5db;
+  --color-gray-400: #9ca3af;
+  --color-gray-500: #6b7280;
+  --color-gray-600: #4b5563;
+  --color-gray-700: #374151;
+  --color-gray-800: #1f2937;
+  --color-gray-900: #111827;
 }
 
-body {
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  /* CHANGED: Dark background to match your new App theme */
-  background-color: #020617; /* Slate 950 */
-  margin: 0;
+@layer base {
+  body {
+    @apply antialiased bg-slate-100 min-h-screen;
+  }
 }
 
-#root {
-  min-height: 100vh;
-}
+@layer utilities {
+  .prose {
+    --tw-prose-body: #374151;
+    --tw-prose-headings: #111827;
+    --tw-prose-lead: #4b5563;
+    --tw-prose-links: #111827;
+    --tw-prose-bold: #111827;
+    --tw-prose-counters: #6b7280;
+    --tw-prose-bullets: #d1d5db;
+    --tw-prose-hr: #e5e7eb;
+    --tw-prose-quotes: #111827;
+    --tw-prose-quote-borders: #e5e7eb;
+    --tw-prose-captions: #6b7280;
+    --tw-prose-kbd: #111827;
+    --tw-prose-kbd-shadows: 17 24 39;
+    --tw-prose-code: #111827;
+    --tw-prose-pre-code: #e5e7eb;
+    --tw-prose-pre-bg: #1f2937;
+    --tw-prose-th-borders: #d1d5db;
+    --tw-prose-td-borders: #e5e7eb;
+  }
 
-/* 3. SCROLLBARS (Dark Mode Optimized) */
-::-webkit-scrollbar {
-  width: 6px;
-}
+  .prose-custom {
+    @apply leading-relaxed text-[#4A4A45];
+  }
+  
+  .pdf-export {
+    @apply shadow-none m-0 p-0 bg-white;
+  }
 
-::-webkit-scrollbar-track {
-  background: #0f172a; /* Dark track */
-}
+  @media print {
+    .pdf-export {
+      padding: 20mm;
+    }
+  }
+  
+  .pdf-export .print\:hidden,
+  .pdf-export .hidden {
+    display: none !important;
+  }
+  
+  .pdf-export .print\:border-none {
+    border: none !important;
+  }
+  
+  .pdf-export .print\:shadow-none {
+    box-shadow: none !important;
+  }
+  
+  .pdf-export .print\:bg-transparent {
+    background-color: transparent !important;
+  }
+  
+  .pdf-export .print\:mb-6 {
+    margin-bottom: 1.5rem !important;
+  }
+  
+  .pdf-export .print\:p-0 {
+    padding: 0 !important;
+  }
+  
+  .pdf-export .print\:border-b-0 {
+    border-bottom-width: 0 !important;
+  }
+  
+  /* Page Break Controls */
+  .pdf-keep-together, .print-avoid-break {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+  
+  .page-break-before-always {
+    break-before: page !important;
+    page-break-before: always !important;
+  }
+  
+  .page-break-after-always {
+    break-after: page !important;
+    page-break-after: always !important;
+  }
 
-::-webkit-scrollbar-thumb {
-  background: #334155; /* Darker thumb */
-  border-radius: 10px;
-}
+  /* PDF specific layout adjustments */
+  .pdf-page {
+    width: 210mm !important;
+    min-height: 297mm !important; /* Changed to min-height */
+    padding: 20mm !important;
+    padding-bottom: 30mm !important; /* Space for footer */
+    margin: 40px auto !important;
+    background: #ffffff !important;
+    box-sizing: border-box !important;
+    position: relative !important;
+    display: flex !important;
+    flex-direction: column !important;
+    box-shadow: 0 0 30px rgba(0,0,0,0.1) !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 8px !important;
+  }
 
-::-webkit-scrollbar-thumb:hover {
-  background: #f5931f; /* Orange on hover */
-}
+  .edit-grid {
+    background-size: 10mm 10mm, 2mm 2mm;
+    background-image: 
+      linear-gradient(to right, rgba(0, 0, 0, 0.05) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(0, 0, 0, 0.05) 1px, transparent 1px),
+      linear-gradient(to right, rgba(0, 0, 0, 0.02) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(0, 0, 0, 0.02) 1px, transparent 1px);
+  }
 
-/* Animations */
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
+  @media print {
+    .pdf-page {
+      margin: 0 !important;
+      box-shadow: none !important;
+      border: none !important;
+      border-radius: 0 !important;
+      page-break-after: always !important;
+      min-height: 297mm !important;
+      position: relative !important;
+    }
 
-.animate-fade-in {
-  animation: fadeIn 0.5s ease-out forwards;
+    .pdf-footer, .footer-legal {
+      position: relative !important; /* Changed from absolute */
+      margin-top: auto !important;
+      width: 100% !important;
+      background: #f8fafc !important;
+      border-top: 1px solid #f1f5f9 !important;
+      padding: 6mm 25mm !important;
+      z-index: 9999 !important;
+      box-sizing: border-box !important;
+      height: auto !important;
+      min-height: 15mm !important;
+    }
+  }
+
+  .pdf-footer {
+    position: relative !important;
+    margin-top: auto !important;
+    width: 100% !important;
+    border: none !important;
+    border-top: 1px solid #f1f5f9 !important;
+    background-color: #f8fafc !important;
+    border-radius: 0 !important;
+    padding: 6mm 25mm !important;
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    z-index: 10 !important;
+  }
+
+  .pdf-export .pdf-footer {
+    display: flex !important;
+  }
+
+  /* PDF Export Mode Fixes */
+  .pdf-export-mode .priority-block {
+    margin-top: 0 !important;
+    margin-bottom: 5px !important;
+    padding: 10px !important;
+    display: block !important;
+  }
+
+  .pdf-step-circle {
+    width: 24px !important;
+    height: 24px !important;
+    background-color: #334155 !important;
+    border-radius: 50% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    color: #ffffff !important;
+    font-weight: bold !important;
+    font-size: 10px !important;
+    z-index: 10 !important;
+    margin: 0 auto 8px auto !important;
+  }
+
+  .pdf-export-mode .footer-legal {
+    position: relative !important;
+    margin-top: auto !important;
+    width: 100% !important;
+    display: flex !important;
+    border-top: 1px solid #e2e8f0 !important;
+    padding: 6mm 25mm !important;
+    background: #f8fafc !important;
+    z-index: 9999 !important;
+    box-sizing: border-box !important;
+    height: auto !important;
+  }
+
+  /* === DER FIX FÜR AUTO-FLOW === */
+  .pdf-export-mode .pdf-page,
+  .pdf-export-mode .pdf-section-container {
+    height: auto !important;
+    min-height: 297mm !important;
+    width: 210mm !important;
+    overflow: visible !important; /* Erlaubt Überlauf auf nächste Seite */
+    page-break-inside: auto !important; /* Erlaubt Umbruch bei Bedarf */
+    transform: none !important;
+    transition: none !important;
+    animation: none !important;
+  }
+
+  .pdf-export-mode .sortable-section {
+    page-break-after: always !important;
+    break-after: page !important;
+    page-break-inside: auto !important; 
+    break-inside: auto !important;
+    margin-bottom: 0 !important;
+    padding-bottom: 0 !important;
+  }
+
+  .pdf-export-mode * {
+    transform: none !important;
+    transition: none !important;
+    animation: none !important;
+  }
+
+  .pdf-report-page {
+    width: 210mm;
+    min-height: 297mm;
+    padding: 25mm;
+    margin: 0 auto;
+    background: white;
+    box-sizing: border-box;
+    position: relative;
+    box-shadow: 0 0 20px #0000000d;
+    overflow: visible;
+  }
+
+  @media print {
+    @page {
+      size: A4 portrait;
+      margin: 0;
+    }
+    body {
+      margin: 0;
+      padding: 0;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+    .pdf-report-page {
+      width: 210mm;
+      min-height: 297mm;
+      padding: 25mm;
+      margin: 0;
+      box-shadow: none;
+      border: none;
+    }
+  }
+
+  /* PDF Export Specific Overrides */
+  .pdf-export {
+    @apply !shadow-none !m-0 !p-0 !bg-white;
+    width: 210mm !important;
+    max-width: 210mm !important;
+  }
+
+  /* Grid to Block Fix for PDF Export */
+  .pdf-export .grid,
+  .pdf-export[class*="grid-cols-"] {
+    display: grid !important;
+    gap: 1rem !important;
+  }
+
+  .pdf-export .priority-block {
+    display: block !important;
+  }
+
+  .pdf-export .grid > *,
+  .pdf-export[class*="grid-cols-"] > * {
+    width: auto !important;
+    margin-bottom: 0 !important;
+  }
+
+  .pdf-export .pdf-section-container {
+    padding-top: 0 !important; 
+    padding-bottom: 30mm !important; 
+    padding-left: 25mm !important;
+    padding-right: 25mm !important;
+    min-height: 297mm !important;
+    height: auto !important;
+    overflow: visible !important; /* Verhindert Abschneiden! */
+  }
+
+  .pdf-export img {
+    max-height: 80mm !important;
+    object-fit: contain !important;
+    width: auto !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+
+  .pdf-export .pdf-cover-page {
+    height: 297mm !important;
+    min-height: 297mm !important;
+    overflow: hidden !important;
+  }
+
+  .pdf-export * {
+    overflow-wrap: break-word !important;
+    word-break: normal !important;
+    line-break: auto !important;
+    white-space: normal !important;
+    text-wrap: wrap !important;
+    break-inside: auto !important;
+    page-break-inside: auto !important;
+    box-sizing: border-box !important;
+    max-width: 100% !important;
+
+    /* Typography & Text Rendering */
+    text-overflow: clip !important;
+    text-rendering: optimizeLegibility !important;
+    -webkit-font-smoothing: antialiased !important;
+    -moz-osx-font-smoothing: grayscale !important;
+  }
+
+  .pdf-export h1, 
+  .pdf-export h2, 
+  .pdf-export h3, 
+  .pdf-export .font-serif {
+    font-family: "Cormorant Garamond", serif !important;
+  }
+
+  .pdf-export p,
+  .pdf-export span,
+  .pdf-export div:not(.font-serif) {
+    font-family: "Inter", sans-serif !important;
+  }
+
+  .pdf-export ::before,
+  .pdf-export ::after {
+    content: none !important;
+  }
+
+  .pdf-export .sortable-section {
+    @apply !shadow-none !border-none !bg-transparent !m-0 !p-0;
+    width: 210mm !important;
+    page-break-after: always !important;
+    break-after: page !important;
+  }
+
+  .pdf-export .pdf-report-page {
+    box-shadow: none !important;
+    margin: 0 !important;
+    border: none !important;
+  }
+
+  /* PDF Color & Contrast Fixes */
+  .pdf-export .a4-card,
+  .pdf-export .a4-card-muted {
+    background-color: #f8fafc !important;
+    border: 1px solid #e2e8f0 !important;
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+
+  .pdf-export .dark-box {
+    background-color: #1e293b !important;
+    color: #ffffff !important;
+    border: 1px solid #1e293b !important;
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+
+  .pdf-export .dark-box p, 
+  .pdf-export .dark-box li, 
+  .pdf-export .dark-box span,
+  .pdf-export .dark-box h1,
+  .pdf-export .dark-box h2,
+  .pdf-export .dark-box h3,
+  .pdf-export .dark-box h4,
+  .pdf-export .dark-box div,
+  .pdf-export .dark-box .prose {
+    color: #ffffff !important;
+    --tw-prose-body: #ffffff !important;
+    --tw-prose-headings: #ffffff !important;
+    --tw-prose-bold: #ffffff !important;
+  }
+
+  /* Professional Typography & Spacing */
+  .section-title {
+    @apply text-4xl font-bold tracking-tight mb-8 text-gray-900;
+  }
+
+  .card-shadow {
+    @apply shadow-sm transition-shadow duration-300;
+  }
+
+  .input-focus {
+    @apply focus:ring-2 focus:ring-emerald-500 outline-none transition-all;
+  }
+
+  .grid-background {
+    background-image: 
+      linear-gradient(to right, #00000005 1px, transparent 1px),
+      linear-gradient(to bottom, #00000005 1px, transparent 1px);
+    background-size: 20px 20px;
+  }
+
+  .a4-content-container {
+    @apply flex flex-col h-full gap-y-6;
+  }
+
+  .a4-section-header {
+    @apply flex items-center gap-4 mb-6;
+  }
+
+  .a4-section-number {
+    @apply w-12 h-12 rounded-xl flex items-center justify-center text-xl font-bold shadow-sm;
+  }
+
+  .a4-label {
+    @apply text-[10px] uppercase tracking-[0.3em] text-gray-600 font-bold mb-0.5;
+  }
+
+  .meta-label {
+    @apply text-[10px] font-bold text-gray-600 uppercase tracking-wider;
+  }
+
+  .highlight {
+    @apply font-bold text-slate-900;
+  }
+
+  .status-badge {
+    @apply inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider;
+  }
+
+  .signature-area {
+    @apply mt-10;
+  }
+
+  .measure-card {
+    @apply break-inside-avoid mb-6;
+  }
+
+  .dark-box {
+    @apply bg-slate-900 text-white p-4 rounded-xl;
+  }
+
+  .dark-box .prose {
+    --tw-prose-body: #ffffff !important;
+    --tw-prose-headings: #ffffff !important;
+    --tw-prose-bold: #ffffff !important;
+    color: #ffffff !important;
+  }
+
+  .dark-box p, .dark-box li, .dark-box span, .dark-box h1, .dark-box h2, .dark-box h3, .dark-box h4, .dark-box div {
+    color: #ffffff !important;
+  }
+
+  .footer-legal {
+    @apply text-[8px] text-gray-400 flex justify-between items-center w-full;
+  }
+
+  .a4-title {
+    @apply text-3xl font-bold tracking-tight text-slate-900 m-0;
+  }
+
+  .a4-card {
+    @apply bg-white p-6 rounded-2xl border border-slate-100 shadow-sm;
+  }
+
+  .a4-card-muted {
+    @apply bg-slate-50 p-6 rounded-2xl border border-slate-100;
+  }
+
+  .a4-card-title {
+    @apply text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 mb-4 flex items-center gap-2;
+  }
+
+  .a4-text-sm {
+    @apply text-sm leading-relaxed text-slate-600;
+  }
+
+  .a4-text-base {
+    @apply text-base leading-relaxed text-slate-700;
+  }
+
+  .a4-text-lg {
+    @apply text-lg leading-relaxed text-slate-700;
+  }
 }
